@@ -108,8 +108,13 @@ const CreateListing = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-  
+    console.log(formData)
+
     try {
+      if (!currentUser) {
+        return navigate('/sign-in');
+      }
+
       if (formData.imageUrls.length < 1) {
         return setError("You must upload at least 1 image");
       }
@@ -118,7 +123,7 @@ const CreateListing = () => {
       }
       setLoading(true);
       setError(false);
-  
+      console.log(currentUser._id)
       const res = await fetch("http://localhost:3000/api/listing/create", {
         method: "POST",
         headers: {
@@ -127,14 +132,15 @@ const CreateListing = () => {
         credentials: 'include', // This will send cookies with the request
         body: JSON.stringify({
           ...formData,
-          userRef: currentUser.user._id,
+          userRef: currentUser._id,
         }),
       });
-  
+
       const data = await res.json();
       setLoading(false);
-  
-      if (!data.success) {
+      console.log(res)
+      console.log(data)
+      if (!res.ok) {
         setError(data.message);
       } else {
         navigate(`/listing/${data._id}`);
@@ -143,8 +149,8 @@ const CreateListing = () => {
       setError(error.message);
       setLoading(false);
     }
+    console.log("Done")
   };
-  
 
   return (
     <main className="p-3 max-w-4xl mx-auto">

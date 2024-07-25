@@ -33,8 +33,8 @@ const SignIn = () => {
 
       if (!res.ok) {
         const errorData = await res.json();
-        setLocalError(errorData.message || "Failed to sign in");
-        dispatch(signInFailure(errorData.message || "Failed to sign in")); // Dispatch action on sign-in failure
+        setLocalError( "Failed to sign in");
+        dispatch(signInFailure( "Failed to sign in")); // Dispatch action on sign-in failure
         return;
       }
 
@@ -43,17 +43,17 @@ const SignIn = () => {
       console.log('Response Data:', data); // Log response data for debugging
 
       if (data.success === false) {
-        setLocalError(data.message); // Set local error message
-        dispatch(signInFailure(data.message)); // Dispatch action on sign-in failure
+        setLocalError("Email or password wrong"); // Set local error message
+        dispatch(signInFailure("Email or password wrong")); // Dispatch action on sign-in failure
         return;
       }
-
-      dispatch(signInSuccess(data)); // Dispatch action on successful sign-in
+      console.log(data.user)
+      dispatch(signInSuccess(data.user)); // Dispatch action on successful sign-in
       navigate("/"); // Redirect to home page after successful sign-in
     } catch (error) {
       console.error('Sign-in Error:', error); // Log error for debugging
-      setLocalError(error.message); // Set local error message
-      dispatch(signInFailure(error.message)); // Dispatch action on error during sign-in
+      setLocalError( "Failed to sign in, Incorrect password or email");
+      dispatch(signInFailure( "Failed to sign in, Incorrect password or email")); // Dispatch action on error during sign-in
     }
   };
 

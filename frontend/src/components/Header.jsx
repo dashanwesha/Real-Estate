@@ -4,12 +4,12 @@ import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 
 const Header = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const currentUser = useSelector((state) => state.user.currentUser);
   const location = useLocation();
 
   const isSignInPage = location.pathname === '/sign-in';
-  console.log(currentUser)
-   
+  console.log(currentUser);
+
   return (
     <header className="bg-slate-200 shadow-lg sticky top-0">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
@@ -37,26 +37,26 @@ const Header = () => {
             <li className="text-slate-700 hover:underline">About</li>
           </Link>
           {!isSignInPage && (
-            <Link to="/profile" className="flex items-center">
-              {currentUser ? (
+            currentUser ? (
+              <Link to="/profile" className="flex items-center">
                 <div className="flex items-center">
-                  {currentUser.user.avatar? (
-                    <img src={currentUser.user.avatar} alt="profile pic" className="rounded-full w-7 h-7 object-cover mr-2" />
+                  {currentUser.avatar ? (
+                    <img src={currentUser.avatar} alt="profile pic" className="rounded-full w-7 h-7 object-cover mr-2" />
                   ) : (
                     <div className="rounded-full w-7 h-7 bg-gray-300 flex items-center justify-center mr-2">
                       <span className="text-gray-600">No Avatar</span>
                     </div>
                   )}
-                  {currentUser.user.email ? (
-                    <span className="text-slate-700">{currentUser.user.email}</span>
+                  {currentUser.email ? (
+                    <span className="text-slate-700">{currentUser.email}</span>
                   ) : (
                     <span className="text-gray-600">No Email</span>
                   )}
                 </div>
-              ) : (
-                <li className="text-slate-700 hover:underline">Sign In</li>
-              )}
-            </Link>
+              </Link>
+            ) : (
+              <Link to="/sign-in" className="text-slate-700 hover:underline">Sign In</Link>
+            )
           )}
         </ul>
       </div>
