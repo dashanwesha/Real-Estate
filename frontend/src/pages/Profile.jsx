@@ -14,7 +14,8 @@ const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const fileRef = useRef();
+  const fileRef = useRef(null);
+  const [file, setFile] = useState(undefined);
   const [filePercentage, setFilePercentage] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
@@ -22,10 +23,10 @@ const Profile = () => {
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
   useEffect(() => {
-    if (currentUser) {
-      setAvatarUrl(currentUser.avatar);
+    if (file) {
+      handleFileUpload(file);
     }
-  }, [currentUser]);
+  }, [file]);
 
   const handleFileUpload = (file) => {
     const user = auth.currentUser;
