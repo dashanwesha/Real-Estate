@@ -2,31 +2,30 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { app, auth, storage } from "../firebase.js";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useNavigate, Link } from 'react-router-dom'; // Added Link and corrected useNavigate import
-import { 
-  updateUserFailure, updateUserStart, updateUserSuccess, 
-  deleteUserFailure, deleteUserStart, deleteUserSuccess, 
-  signInStart, signOutUserFailure, signOutUserSuccess 
-} from '../../redux/user/userSlice.js'; 
+import { useNavigate, Link } from 'react-router-dom';
+import {
+  updateUserFailure, updateUserStart, updateUserSuccess,
+  deleteUserFailure, deleteUserStart, deleteUserSuccess,
+  signOutUserStart, signOutUserFailure, signOutUserSuccess
+} from '../../redux/user/userSlice.js';
 
 const Profile = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // Corrected position of useDispatch
+  const dispatch = useDispatch();
 
-  const fileRef = useRef(null);
-  const [file, setFile] = useState(undefined);
+  const fileRef = useRef();
   const [filePercentage, setFilePercentage] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
-  const [avatarUrl, setAvatarUrl] = useState(currentUser?.user.avatar || '');
+  const [avatarUrl, setAvatarUrl] = useState(currentUser?.avatar || 'https://via.placeholder.com/150');
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
   useEffect(() => {
-    if (file) {
-      handleFileUpload(file);
+    if (currentUser) {
+      setAvatarUrl(currentUser.avatar);
     }
-  }, [file]);
+  }, [currentUser]);
 
   const handleFileUpload = (file) => {
     const user = auth.currentUser;
@@ -48,7 +47,7 @@ const Profile = () => {
         },
         async () => {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setAvatarUrl(downloadURL); // Update avatar URL
+          setAvatarUrl(downloadURL);
           setFormData((formData) => ({
             ...formData,
             avatar: downloadURL,
@@ -57,13 +56,12 @@ const Profile = () => {
       );
     } else {
       console.error("User is not authenticated. Cannot upload file.");
-      // navigate('/login'); // Redirect to login page if user is not authenticated
+      navigate('/sign-in');
     }
   };
 
-  const defaultAvatar = 'https://via.placeholder.com/150';
   const handleChange = (e) => {
-    setFormData({...formData, [e.target.id]: e.target.value});
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -80,8 +78,8 @@ const Profile = () => {
       });
 
       const data = await res.json();
-
-      if (data.success === false) {
+      console.log(res, data)
+      if (!res.ok) {
         dispatch(updateUserFailure(data.message));
         return;
       }
@@ -99,7 +97,7 @@ const Profile = () => {
         method: "DELETE"
       });
       const data = await res.json();
-      if (data.success === false) {
+      if (!res.ok) {
         dispatch(deleteUserFailure(data.message));
         return;
       }
@@ -111,11 +109,11 @@ const Profile = () => {
 
   const handleSignOut = async () => {
     try {
-      dispatch(signInStart());
+      dispatch(signOutUserStart());
       const res = await fetch("http://localhost:3000/api/auth/signout");
       const data = await res.json();
 
-      if (data.success === false) {
+      if (!res.ok) {
         dispatch(signOutUserFailure(data.message));
         return;
       }
@@ -131,13 +129,13 @@ const Profile = () => {
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           type="file"
-          onChange={(e) => setFile(e.target.files[0])}
+          onChange={(e) => handleFileUpload(e.target.files[0])}
           ref={fileRef}
           accept="image/*"
           hidden
         />
         <img
-          src={avatarUrl || defaultAvatar}
+          src={avatarUrl || 'https://via.placeholder.com/150'}
           alt="profile"
           className="rounded-full w-24 h-24 object-cover cursor-pointer self-center mt-2"
           onClick={() => fileRef.current.click()}
@@ -178,6 +176,7 @@ const Profile = () => {
         />
         <button disabled={loading}
           className="bg-slate-700 rounded-lg p-3 text-white uppercase hover:opacity-95 disabled:opacity-80"
+          type='submit'
         >
           {loading ? "Loading..." : "Update"}
         </button>

@@ -1,4 +1,5 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+
 const listingSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -29,25 +30,26 @@ const listingSchema = new mongoose.Schema({
     required: true,
   }, 
   offer: {
-  type: Boolean, 
-  required: true, 
+    type: Boolean, 
+    required: true, 
   },
   parking: {
     type: Boolean, 
     required: true, 
-    },
-    type: {
-        type: String,
-        required: true,
-    },
-    imageUrls: {
-        type: Array,
-        required: true
-    },
-   userRef: {
+  },
+  type: {
+    type: String,
+    required: true,
+  },
+  imageUrls: {
+    type: [String],
+    required: true
+  },
+  userRef: {
     type: String,
     required: true
-   } 
-}, {timestamps: true})
-const Listing = mongoose.model("Listing",listingSchema)
-export default Listing
+  }
+}, { timestamps: true });
+
+const Listing = mongoose.model("Listing", listingSchema);
+export default Listing;
